@@ -1,52 +1,69 @@
-# ⚡ Nexus Forex Scalper AI - அதிவேக ஃபாரக்ஸ் மைக்ரோ-டிரேடிங் டெர்மினல்
+# ⚡ Raghav Forex Scalper AI - High-Frequency Trading Terminal
 
-Nexus Forex Scalper AI என்பது சர்வதேச ஃபாரக்ஸ் சந்தையில் (Forex Markets - EUR/USD, GBP/USD, USD/JPY, Gold/XAU/USD) மைக்ரோ-பிப்ஸ் (Micro-Pips: 3 to 6 Pips) நகர்வுகளை நொடிப் பொழுதில் பிடித்து, அதிவேகமாக வாங்குதல் (Buy) மற்றும் விற்பனை (Sell) செய்து லாபத்துடன் வெளியேறும் வகையில் பிரத்யேகமாக வடிவமைக்கப்பட்ட அப்ளிகேஷன் ஆகும்.
-
----
-
-## 🚀 அப்ளிகேஷனை உடனடியாக பிரவுசரில் இயக்குவது எப்படி?
-
-எந்த கூடுதல் மென்பொருளும் இன்றி உடனடியாக உங்கள் பிரவுசரில் (Google Chrome / Microsoft Edge) இயக்கலாம்:
-
-1. இந்த ஃபைலைத் திறக்கவும்:
-   `C:\Users\srira\.gemini\antigravity\scratch\scalp_trading_app\index.html`
-2. பிரவுசரில் திறந்ததும், **"▶ START FOREX SCALPER"** என்ற பட்டனை அழுத்தவும்.
-3. பாட் உடனடியாக 5-டெசிமல் லைவ் ஃபாரக்ஸ் டிக் தரவுகளை ஆய்வு செய்து, ஆட்டோமேட்டிக்காக ஆர்டர்களை இயக்கும்!
+Raghav Forex Scalper AI is an automated, high-speed algorithmic scalping system designed specifically for international Forex and Precious Metal markets (**EUR/USD, GBP/USD, USD/JPY, Gold / XAU/USD**). It captures micro-pip price fluctuations (3 to 6 pips), enters rapidly, and exits with strict profit targets and risk protection.
 
 ---
 
-## 🎯 ஃபாரக்ஸ் மைக்ரோ-ஸ்கேல்பிங் உத்திகள் (Forex Scalping Fundamentals)
+## 🚀 Quick Launch (Zero-Install Browser App)
 
-### 1. குட்டி குட்டி நகர்வுகளைப் பிடித்தல் (Micro-Pips Capture)
-- **Take-Profit (TP)**: `5.0 Pips` (EUR/USD-ல் 5 pips சிறிய ஏற்றம் வந்தவுடன் உடனடியாக லாபம் எடுக்கப்பட்டு ஆர்டர் மூடப்படும்).
-- **Stop-Loss (SL)**: `3.0 Pips` (திசை மாறினால் 3 pips-ல் உடனடி வெளியேற்றம் - மிகக் குறைந்த நஷ்டம்).
-- **Forex Trailing Stop-Loss (நஷ்டத் தடுப்பு & லாபப் பாதுகாப்பு)**:
-  - ஆர்டர் `+2.5 Pips` லாபத்தை அடைந்தவுடன், ஸ்டாப் லாஸ் தானாகவே **Breakeven (+0.5 Pip)** நிலைக்கு நகர்த்தப்படும். இதனால் அந்த டிரேடில் நஷ்டம் ஏற்படவே வாய்ப்பில்லை!
-  - விலை மேலும் ஏற ஏற, ஸ்டாப் லாஸ் பின் தொடர்ந்து சென்று அதிகபட்ச லாபத்தைப் பாதுகாக்கும்.
+You can launch the trading application instantly in any modern web browser (Google Chrome or Microsoft Edge):
 
-### 2. ஸ்பிரெட் நஷ்டத் தடுப்பு ஃபில்டர் (Spread Protection Filter)
-- ஃபாரக்ஸ் ஸ்கேல்பிங்கில் தரகரின் ஸ்பிரெட் (Spread) மிக முக்கியமானது.
-- புரோக்கரின் ஸ்பிரெட் `1.2 Pips`-க்கு அதிகமாக இருக்கும் தருணங்களில் பாட் தானாக டிரேடிங் செய்வதைத் தவிர்க்கும்.
-
-### 3. லாட் அளவு மற்றும் கணக்கீடு (Lot Size & Pip Value)
-- **0.01 Micro Lot**: 1 Pip = `$0.10` (ஆரம்ப கட்டத்திற்கு மிகவும் பாதுகாப்பானது)
-- **0.10 Mini Lot**: 1 Pip = `$1.00` (பரிந்துரைக்கப்படும் அளவு: 5 pips = $5.00 லாபம்)
-- **1.00 Standard Lot**: 1 Pip = `$10.00` (5 pips = $50.00 லாபம்)
+1. **Desktop Shortcut**: Double-click **`⚡ Raghav Forex Scalper.bat`** on your Desktop.
+   - Or open: [`index.html`](file:///C:/Users/srira/Desktop/Raghav_Trading_Bot/index.html)
+2. **Start Scalping**: Click the green **"▶ START FOREX SCALPER"** button.
+3. The bot immediately analyzes live 5-decimal tick streams and executes automated micro-scalp orders!
 
 ---
 
-## 🛡️ முழுமையான மூலதனப் பாதுகாப்பு சுற்றுகள் (Risk Protection)
+## 🎯 Core Scalping Strategy & Risk Fundamentals
 
-1. **Daily Circuit Breaker (-$50.00)**:
-   - ஒரு நாளில் $50 இழப்பு வந்தால், மொத்த கணக்கையும் பாதுகாக்க பாட் தானாக நின்றுவிடும்.
+### 1. Rapid Micro-Pip Execution
+- **Take-Profit Target (TP)**: `5.0 Pips` (Configurable from 2.0 to 15.0 pips). Captures small market impulses and locks in gains instantly.
+- **Strict Stop-Loss (SL)**: `3.0 Pips` (Configurable from 1.5 to 8.0 pips). Prevents severe drawdowns by cutting adverse price moves immediately.
+- **Dynamic Trailing Stop-Loss**:
+  - Once a trade reaches `+2.5 Pips` in profit, the Stop-Loss automatically shifts to **Breakeven (+0.5 Pip)** to eliminate downside risk and cover broker fees.
+  - As price climbs higher, the SL trails the peak price by `1.8 Pips`, maximizing micro-surge gains.
+
+### 2. Spread Protection Filter
+- Wide broker spreads can eat away scalping returns.
+- The engine continuously monitors the live Bid/Ask spread. If the spread exceeds `1.2 Pips`, trade entries are automatically paused.
+
+### 3. Lot Sizing & Pip Valuation (USD)
+- **0.01 Micro Lot**: 1 Pip = `$0.10` (Safest for small balances)
+- **0.10 Mini Lot**: 1 Pip = `$1.00` (Recommended: 5 Pips = `$5.00` profit)
+- **1.00 Standard Lot**: 1 Pip = `$10.00` (5 Pips = `$50.00` profit)
+
+---
+
+## 🛡️ Circuit Breakers & Capital Protection
+
+1. **Max Daily Loss Limit (`-$50.00`)**:
+   - The bot automatically halts all trading if daily losses reach the configured limit to protect principal balance.
 2. **Consecutive Loss Cooldown**:
-   - தொடர்ந்து 2 நஷ்டங்கள் ஏற்பட்டால், அமைதியற்ற சந்தை (Choppy Market) மாறும் வரை 3 நிமிடங்கள் பாட் இடைவேளை எடுக்கும்.
-3. **Emergency Exit**:
-   - ஒரு கிளிக்கில் அனைத்து ஃபாரக்ஸ் ஆர்டர்களையும் மூடிவிடலாம்.
+   - If 2 consecutive losses occur, the bot pauses for 3 minutes to avoid choppy whipsaw markets.
+3. **Emergency Panic Button**:
+   - One-click **"EMERGENCY EXIT"** closes all open positions immediately and halts the bot.
 
 ---
 
-## 🔌 நிஜ ஃபாரக்ஸ் புரோக்கருடன் இணைப்பது எப்படி? (MetaTrader 5 Integration)
+## 🔌 MetaTrader 5 (MT5) Live Broker Connection
 
-- [mt5_forex_connector.py](file:///C:/Users/srira/.gemini/antigravity/scratch/scalp_trading_app/mt5_forex_connector.py) ஸ்கிரிப்ட் மூலமாக Exness, IC Markets, XM, Pepperstone போன்ற சர்வதேச MT5 கணக்குகளுடன் இணைத்து ஆட்டோமேட்டிக்காக நிஜச் சந்தையில் இயக்க முடியும்.
-- MT5-ல் ஆர்டர் இடும்போதே புரோக்கர் சர்வரிலேயே Stop Loss மற்றும் Take Profit செட் செய்யப்படுவதால், இன்டர்நெட் துண்டிக்கப்பட்டாலும் உங்கள் Stop Loss பாதுகாப்பாக செயல்படும்!
+- The [`mt5_forex_connector.py`](file:///C:/Users/srira/Desktop/Raghav_Trading_Bot/mt5_forex_connector.py) script bridges the algorithm to any live MT5 Forex broker account (**Exness, XM Global, IC Markets, OctaFX, Pepperstone**, etc.).
+- Orders are submitted with server-side Stop Loss and Take Profit, ensuring execution protection even during local internet interruptions.
+- Live credentials can be configured directly inside the application via the **`🔑 CONNECT MT5 LIVE`** modal or saved in [`account_config.json`](file:///C:/Users/srira/Desktop/Raghav_Trading_Bot/account_config.json).
+
+---
+
+## 📁 Repository Structure
+
+- `index.html` - Professional dark-mode trading terminal UI.
+- `styles.css` - Responsive financial terminal styling.
+- `chart_engine.js` - High-performance 60 FPS Canvas candlestick, EMA, VWAP, and RSI chart.
+- `scalper_bot.js` - Algorithmic execution engine, risk controls, and live tick stream.
+- `mt5_forex_connector.py` - Official MetaTrader 5 Python bridge.
+- `strategy_engine.py` - Core momentum confluence logic.
+- `broker_connectors.py` - Modular broker interfaces.
+- `account_config.json` - Secure account connection parameters.
+- `Start_Raghav_Bot.bat` - 1-click terminal launcher.
+- `Install_MetaTrader5.bat` - 1-click MT5 setup script.
+- `.gitignore` - Protects sensitive files and excludes binary installers.
