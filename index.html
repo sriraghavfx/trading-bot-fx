@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="ta">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nexus Forex Scalper AI - அதிவேக ஃபாரக்ஸ் மைக்ரோ-டிரேடிங் டெர்மினல்</title>
+  <title>Raghav Forex Scalper AI - High-Frequency Trading Terminal</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -16,25 +16,25 @@
     <div class="brand">
       <div class="brand-icon">⚡</div>
       <div>
-        <div class="brand-name">FOREX SCALPER PRO AI</div>
-        <div style="font-size: 10px; color: var(--text-secondary);">அதிவேக ஃபாரக்ஸ் மைக்ரோ-டிரேடிங் பாட் (Pip Scalper)</div>
+        <div class="brand-name">RAGHAV FOREX SCALPER AI</div>
+        <div style="font-size: 10px; color: var(--text-secondary);">High-Frequency Forex Micro-Pip Scalper</div>
       </div>
       <span class="brand-tag">MT4/MT5 Engine</span>
     </div>
 
-    <!-- Forex Currency Pair Selector & Live Bid/Ask/Spread -->
+    <!-- Forex Pair Selector & Live Bid/Ask/Spread -->
     <div class="market-bar">
       <select id="marketSelect" class="market-select">
         <option value="EURUSD" selected>EUR / USD (Euro)</option>
         <option value="GBPUSD">GBP / USD (British Pound)</option>
         <option value="USDJPY">USD / JPY (Japanese Yen)</option>
-        <option value="XAUUSD">XAU / USD (Gold / தங்கம்)</option>
+        <option value="XAUUSD">XAU / USD (Gold)</option>
         <option value="AUDUSD">AUD / USD (Aussie Dollar)</option>
         <option value="EURJPY">EUR / JPY (Euro / Yen)</option>
       </select>
 
       <div class="ticker-display">
-        <span class="live-price" id="headerLivePrice">1.08452</span>
+        <span class="live-price" id="headerLivePrice">1.08450</span>
         <div class="spread-badge" id="headerSpreadBadge">
           <span>Spread:</span>
           <b id="headerSpreadVal">0.6</b>
@@ -76,6 +76,8 @@
           <div style="color: var(--text-muted); font-size: 11px;">
             Chart: <b>5-Decimal Micro-Pips</b> | Strategy: <b>Forex Micro-Momentum</b>
           </div>
+        </div>
+
         <!-- Live Active Position Alert Bar -->
         <div id="activePositionBanner" style="display: none; background: rgba(41, 121, 255, 0.12); border-bottom: 1px solid var(--blue); padding: 8px 16px; justify-content: space-between; align-items: center; font-size: 12px; font-family: var(--font-mono);">
           <div style="display: flex; align-items: center; gap: 12px;">
@@ -102,19 +104,19 @@
         <!-- Live Stat Cards -->
         <div class="stats-card-grid">
           <div class="stat-box">
-            <span class="stat-label">நிகர லாபம் / நஷ்டம் (Net P&L)</span>
+            <span class="stat-label">Net Profit / Loss (USD)</span>
             <span class="stat-value price-up" id="statNetPnL">+$0.00</span>
           </div>
           <div class="stat-box">
-            <span class="stat-label">வெற்றி விகிதம் (Win Rate)</span>
+            <span class="stat-label">Win Rate %</span>
             <span class="stat-value" id="statWinRate" style="color: var(--green);">0.0%</span>
           </div>
           <div class="stat-box">
-            <span class="stat-label">மொத்த Pips (Net Pips)</span>
+            <span class="stat-label">Net Pips Gained</span>
             <span class="stat-value price-up" id="statTotalPips">+0.0 Pips</span>
           </div>
           <div class="stat-box">
-            <span class="stat-label">முடிந்த டிரேடுகள் (Total Trades)</span>
+            <span class="stat-label">Total Trades</span>
             <span class="stat-value" id="statTotalTrades">0</span>
           </div>
         </div>
@@ -122,9 +124,9 @@
         <!-- Tabbed Tables: Active Positions & Trade Logs -->
         <div class="tables-container">
           <div class="tab-headers">
-            <button class="tab-btn active" data-tab="activePositionsTab">நேரலை பொசிஷன்கள் (Active Trades: <span id="activePositionsCount">0</span>)</button>
-            <button class="tab-btn" data-tab="tradeHistoryTab">முடிந்த டிரேடுகள் (Forex Trade History)</button>
-            <button class="tab-btn" data-tab="activityLogsTab">பாட் பதிவுகள் (MT5 System Logs)</button>
+            <button class="tab-btn active" data-tab="activePositionsTab">Active Positions (<span id="activePositionsCount">0</span>)</button>
+            <button class="tab-btn" data-tab="tradeHistoryTab">Trade History</button>
+            <button class="tab-btn" data-tab="activityLogsTab">System Logs</button>
           </div>
 
           <!-- Active Positions Tab -->
@@ -132,20 +134,20 @@
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>நேரம்</th>
-                  <th>Forex ஜோடி</th>
-                  <th>வகை</th>
+                  <th>Time</th>
+                  <th>Pair</th>
+                  <th>Side</th>
                   <th>Lot Size</th>
-                  <th>நுழைவு விலை</th>
-                  <th>தற்போதைய விலை</th>
-                  <th>TP (Pips)</th>
-                  <th>Stop Loss (Pips)</th>
+                  <th>Entry Price</th>
+                  <th>Current Price</th>
+                  <th>TP Target</th>
+                  <th>Stop Loss</th>
                   <th>P&L (Pips / $)</th>
-                  <th>செயல்பாடு</th>
+                  <th>Action</th>
                 </tr>
               </thead>
               <tbody id="activePositionsBody">
-                <tr><td colspan="10" style="text-align: center; color: var(--text-muted); padding: 20px;">தற்போது எந்த ஃபாரக்ஸ் டிரேடும் இயக்கத்தில் இல்லை.</td></tr>
+                <tr><td colspan="10" style="text-align: center; color: var(--text-muted); padding: 20px;">No open positions. Use "▲ BUY" or "▼ SELL" buttons above to open a position.</td></tr>
               </tbody>
             </table>
           </div>
@@ -155,19 +157,19 @@
             <table class="data-table">
               <thead>
                 <tr>
-                  <th>நேரம்</th>
-                  <th>ஜோடி</th>
-                  <th>வகை</th>
+                  <th>Time</th>
+                  <th>Pair</th>
+                  <th>Side</th>
                   <th>Lots</th>
-                  <th>நுழைவு</th>
-                  <th>வெளியேறிய விலை</th>
+                  <th>Entry</th>
+                  <th>Exit Price</th>
                   <th>Pips</th>
-                  <th>நிகர லாபம் ($)</th>
-                  <th>காரணம் (Reason)</th>
+                  <th>Net P&L ($)</th>
+                  <th>Exit Reason</th>
                 </tr>
               </thead>
               <tbody id="tradeHistoryBody">
-                <tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 20px;">வர்த்தக வரலாறு ஏதுமில்லை.</td></tr>
+                <tr><td colspan="9" style="text-align: center; color: var(--text-muted); padding: 20px;">No trade history yet.</td></tr>
               </tbody>
             </table>
           </div>
@@ -187,7 +189,7 @@
       <!-- Master Switch Card -->
       <div class="panel-card" style="border-color: var(--border-color); background: linear-gradient(180deg, var(--bg-tertiary), var(--bg-secondary));">
         <div class="card-title">
-          <span>பாட் கட்டுப்பாடு (Bot Control)</span>
+          <span>Bot Control</span>
           <span class="bot-status-badge status-idle" id="botStatusBadge">IDLE</span>
         </div>
         <button class="btn-toggle-bot stopped" id="btnToggleBot">
@@ -211,53 +213,53 @@
       <!-- Lot Size & Capital -->
       <div class="panel-card">
         <div class="card-title">
-          <span>லாட் அளவு & மூலதனம் (Lot Sizing)</span>
+          <span>Lot Sizing & Capital</span>
         </div>
         
         <div class="control-group">
-          <label class="control-label">Lot Size (வர்த்தக அளவு)</label>
+          <label class="control-label">Trade Lot Size</label>
           <select id="selectLotSize" class="input-control">
-            <option value="0.01">0.01 Micro Lot (விகிதம்: $0.10/pip - மிகவும் பாதுகாப்பானது)</option>
-            <option value="0.05">0.05 Lot (விகிதம்: $0.50/pip)</option>
-            <option value="0.10" selected>0.10 Mini Lot (விகிதம்: $1.00/pip - பரிந்துரை)</option>
-            <option value="0.50">0.50 Lot (விகிதம்: $5.00/pip)</option>
-            <option value="1.00">1.00 Standard Lot (விகிதம்: $10.00/pip)</option>
+            <option value="0.01">0.01 Micro Lot ($0.10/pip - Safest)</option>
+            <option value="0.05">0.05 Lot ($0.50/pip)</option>
+            <option value="0.10" selected>0.10 Mini Lot ($1.00/pip - Recommended)</option>
+            <option value="0.50">0.50 Lot ($5.00/pip)</option>
+            <option value="1.00">1.00 Standard Lot ($10.00/pip)</option>
           </select>
-          <span style="font-size: 10px; color: var(--text-muted);">குறைந்த லாட் அளவு உங்கள் கணக்கை நஷ்டத்திலிருந்து பாதுகாக்கும்.</span>
+          <span style="font-size: 10px; color: var(--text-muted);">Lower lot size protects your account from excessive drawdowns.</span>
         </div>
       </div>
 
       <!-- Strategy Parameters (Micro-Pips) -->
       <div class="panel-card">
         <div class="card-title">
-          <span>மைக்ரோ-பிப் இலக்குகள் (Pip Settings)</span>
+          <span>Micro-Pip Settings</span>
         </div>
 
         <!-- Take Profit in Pips -->
         <div class="control-group">
           <div class="control-label">
-            <span>Take-Profit இலக்கு (TP)</span>
+            <span>Take-Profit Target (TP)</span>
             <span class="control-val" id="valTakeProfit">5.0 Pips</span>
           </div>
           <input type="range" id="inputTakeProfit" min="2.0" max="15.0" step="0.5" value="5.0">
-          <span style="font-size: 10px; color: var(--text-muted);">சிறிய 4-6 pips கிடைத்தவுடன் உடனே லாபத்துடன் வெளியேறும்.</span>
+          <span style="font-size: 10px; color: var(--text-muted);">Quick exit upon capturing small price micro-moves.</span>
         </div>
 
         <!-- Stop Loss in Pips -->
         <div class="control-group">
           <div class="control-label">
-            <span>Stop-Loss நஷ்ட வரம்பு (SL)</span>
+            <span>Stop-Loss Limit (SL)</span>
             <span class="control-val price-down" id="valStopLoss">3.0 Pips</span>
           </div>
           <input type="range" id="inputStopLoss" min="1.5" max="8.0" step="0.5" value="3.0">
-          <span style="font-size: 10px; color: var(--text-muted);">எதிர் திசையில் 3 pips போனால் உடனே மிகச் சிறிய நஷ்டத்தில் கட் செய்யும்.</span>
+          <span style="font-size: 10px; color: var(--text-muted);">Strict stop loss to cut adverse moves immediately.</span>
         </div>
 
         <!-- Trailing Stop Loss -->
         <div class="control-group" style="flex-direction: row; justify-content: space-between; align-items: center; margin-top: 6px;">
           <div>
             <div style="font-size: 12px; font-weight: 600;">Trailing Stop Loss</div>
-            <div style="font-size: 10px; color: var(--text-muted);">+2.5 Pips லாபம் வந்ததும் SL-ஐ Breakeven-க்கு நகர்த்தும்</div>
+            <div style="font-size: 10px; color: var(--text-muted);">Moves SL to Breakeven (+0.5p) at +2.5p gain</div>
           </div>
           <input type="checkbox" id="inputTrailingSL" checked style="width: 18px; height: 18px; accent-color: var(--green); cursor: pointer;">
         </div>
@@ -265,20 +267,20 @@
         <!-- Spread Filter -->
         <div class="control-group" style="margin-top: 8px;">
           <div class="control-label">
-            <span>அதிகபட்ச Spread வரம்பு (Max Spread)</span>
+            <span>Max Spread Filter</span>
             <span class="control-val" id="valMaxSpread">1.2 Pips</span>
           </div>
           <input type="range" id="inputMaxSpread" min="0.5" max="2.5" step="0.1" value="1.2">
-          <span style="font-size: 10px; color: var(--text-muted);">புரோக்கர் ஸ்பிரெட் 1.2 pips-க்கு மேல் இருந்தால் பாட் டிரேட் எடுக்காது (ஸ்பிரெட் நஷ்டத் தடுப்பு).</span>
+          <span style="font-size: 10px; color: var(--text-muted);">Pauses entry if broker spread exceeds this value.</span>
         </div>
 
         <!-- Execution Speed -->
         <div class="control-group" style="margin-top: 8px;">
-          <label class="control-label">டிக் வேகம் (Tick Frequency)</label>
+          <label class="control-label">Tick Speed Frequency</label>
           <select id="selectSpeed" class="input-control">
-            <option value="1000" selected>⚡ 1 நொடி (Ultra-Fast Tick)</option>
-            <option value="2000">🚀 2 நொடிகள் (Fast)</option>
-            <option value="4000">⏱ 4 நொடிகள் (Normal)</option>
+            <option value="1000" selected>⚡ 1 Second (Ultra-Fast)</option>
+            <option value="2000">🚀 2 Seconds (Fast)</option>
+            <option value="4000">⏱ 4 Seconds (Normal)</option>
           </select>
         </div>
       </div>
@@ -286,31 +288,31 @@
       <!-- Risk Management & Circuit Breakers -->
       <div class="panel-card">
         <div class="card-title">
-          <span>இடர் மேலாண்மை (Risk Control)</span>
-          <span style="color: var(--green); font-size: 11px;">🛡️ Active</span>
+          <span>Risk Management</span>
+          <span style="color: var(--green); font-size: 11px;">🛡️ Protected</span>
         </div>
 
         <!-- Max Daily Loss in USD -->
         <div class="control-group">
           <div class="control-label">
-            <span>தினசரி அதிகபட்ச நஷ்ட வரம்பு</span>
+            <span>Max Daily Loss Limit</span>
             <span class="control-val price-down">-$50.00</span>
           </div>
-          <span style="font-size: 10px; color: var(--text-muted);">ஒரு நாளில் $50 இழப்பு வந்தால் பாட் தானாக ஆஃப் ஆகி முழு கணக்கையும் பாதுகாக்கும்.</span>
+          <span style="font-size: 10px; color: var(--text-muted);">Auto-stops bot if daily loss limit is hit.</span>
         </div>
 
         <!-- Loss Streak Cooldown -->
         <div class="control-group">
           <div class="control-label">
-            <span>தொடர் நஷ்ட இடைவேளை (Cooldown)</span>
+            <span>Loss Streak Cooldown</span>
             <span class="control-val">2 Trades</span>
           </div>
-          <span style="font-size: 10px; color: var(--text-muted);">தொடர்ந்து 2 இழப்பு வந்தால் சந்தை அமைதியாகும் வரை 3 நிமிட இடைவேளை.</span>
+          <span style="font-size: 10px; color: var(--text-muted);">3-minute pause after 2 losses for market calming.</span>
         </div>
 
         <!-- Audio Alerts Toggle -->
         <div class="control-group" style="flex-direction: row; justify-content: space-between; align-items: center; margin-top: 6px;">
-          <span style="font-size: 12px;">ஒலி அறிவிப்புகள் (Audio Chimes)</span>
+          <span style="font-size: 12px;">Audio Alert Chimes</span>
           <input type="checkbox" id="inputAudioAlerts" checked style="width: 18px; height: 18px; accent-color: var(--blue); cursor: pointer;">
         </div>
       </div>
