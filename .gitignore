@@ -1,0 +1,16 @@
+# Executables and installers
+*.exe
+*.msi
+mt5setup.exe
+python_setup.exe
+
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+
+# Local credentials and logs
+*.log
+.env
+.DS_Store
+Thumbs.db
