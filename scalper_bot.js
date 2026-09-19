@@ -1,7 +1,7 @@
 /**
- * Nexus Forex Scalper AI - Forex Pip-Scalper Engine
- * Supports BOTH Demo (Simulation) and LIVE BROKER (Real Money Execution)
- * MetaTrader 5 (MT5) Bridge, Bidirectional Buy/Sell, Strict 3-Pip SL, 5-Pip TP & Trailing Stop
+ * Raghav Forex Scalper AI - Forex Pip-Scalper Engine
+ * Directly Linked to MetaTrader 5 (MT5) Desktop Application
+ * Live Tick Streaming, Real MT5 Order Execution, Strict 3-Pip SL & 5-Pip TP
  */
 
 class ForexScalperEngine {
@@ -18,14 +18,19 @@ class ForexScalperEngine {
     this.tradeMarkers = [];
     this.timer = null;
 
-    // Load saved MT5 live account credentials if any
+    // MT5 Bridge State
+    this.apiBase = (window.location.port === '5000' || window.location.origin.includes('5000')) 
+      ? '' 
+      : 'http://127.0.0.1:5000';
+    this.mt5Online = false;
+    this.mt5Account = null;
+
     try {
       this.liveAccount = JSON.parse(localStorage.getItem('raghav_live_account') || 'null');
     } catch (e) {
       this.liveAccount = null;
     }
 
-    // Forex Configuration
     this.config = {
       lotSize: 0.10,            // 0.10 Mini Lot ($1.00 per pip on EUR/USD)
       takeProfitPips: 5.0,      // 5.0 Pips
@@ -38,7 +43,6 @@ class ForexScalperEngine {
       audioEnabled: true
     };
 
-    // Performance Stats
     this.stats = {
       netUSD: 0,
       netPips: 0,
@@ -51,7 +55,6 @@ class ForexScalperEngine {
       inCooldownUntil: 0
     };
 
-    // Forex Pair Profiles
     this.pairProfiles = {
       EURUSD: { basePrice: 1.08450, decimals: 5, pipMult: 10000, volatility: 0.00008, baseSpread: 0.6, name: 'EUR / USD' },
       GBPUSD: { basePrice: 1.29820, decimals: 5, pipMult: 10000, volatility: 0.00010, baseSpread: 0.8, name: 'GBP / USD' },
@@ -67,10 +70,52 @@ class ForexScalperEngine {
     this.initPair(this.pair);
     this.bindUI();
 
-    if (this.liveAccount) {
-      this.log(`[MT5 ACCOUNT] Saved Account Loaded: ${this.liveAccount.broker} #${this.liveAccount.account}`);
+    // Check MT5 Bridge Server connection immediately
+    this.checkMT5Bridge();
+    setInterval(() => this.checkMT5Bridge(), 4000);
+
+    this.log('[SYSTEM] Raghav Forex Scalper AI Initialized.');
+  }
+
+  async checkMT5Bridge() {
+    const tag = document.getElementById('mt5ConnectionTag');
+    const balEl = document.getElementById('headerAccountBalance');
+    try {
+      const res = await fetch(`${this.apiBase}/api/status`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data.connected) {
+          if (!this.mt5Online) {
+            this.log('[MT5 LINKED] 🟢 MetaTrader 5 Terminal connected! Live orders enabled.');
+          }
+          this.mt5Online = true;
+          this.mt5Account = data.account;
+          if (tag) {
+            tag.textContent = '🟢 MT5 LINKED (LIVE)';
+            tag.style.color = '#00e676';
+            tag.style.borderColor = '#00e676';
+            tag.style.background = 'rgba(0, 230, 118, 0.15)';
+          }
+          if (balEl && data.account) {
+            balEl.textContent = `| Balance: $${data.account.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} (Equity: $${data.account.equity.toLocaleString('en-US', { minimumFractionDigits: 2 })})`;
+          }
+          return;
+        }
+      }
+    } catch (e) {
+      // Bridge server not running
     }
-    this.log('[SYSTEM] Forex Scalper Pro Engine Active. Ready for Live and Demo markets.');
+
+    this.mt5Online = false;
+    if (tag) {
+      tag.textContent = '🟡 STANDALONE (SIM)';
+      tag.style.color = '#ffab00';
+      tag.style.borderColor = '#ffab00';
+      tag.style.background = 'rgba(255, 171, 0, 0.15)';
+    }
+    if (balEl) {
+      balEl.textContent = '';
+    }
   }
 
   initPair(pairKey) {
@@ -86,7 +131,6 @@ class ForexScalperEngine {
     this.tradeMarkers = [];
     this.activeTrade = null;
 
-    // Generate initial 50 historical micro-candles
     let p = profile.basePrice;
     const now = Date.now();
     for (let i = 50; i >= 0; i--) {
@@ -114,29 +158,27 @@ class ForexScalperEngine {
   }
 
   bindUI() {
-    // Start / Stop Bot
     const btnToggle = document.getElementById('btnToggleBot');
     btnToggle.addEventListener('click', () => {
       this.toggleBot();
     });
 
-    // Mode Toggle (Demo vs Live)
     const modeBadge = document.getElementById('modeBadge');
     const modeDot = document.getElementById('modeDot');
     const modeText = document.getElementById('modeText');
 
     modeBadge.addEventListener('click', () => {
       if (this.tradingMode === 'DEMO') {
-        if (!this.liveAccount) {
-          document.getElementById('accountModal').style.display = 'flex';
-          return;
-        }
         this.tradingMode = 'LIVE';
         modeBadge.className = 'mode-badge live';
         modeDot.className = 'mode-dot live';
-        modeText.textContent = `LIVE MT5 (${this.liveAccount.broker || 'Live'})`;
-        this.log('[MODE] 🔴 LIVE BROKER MODE ACTIVATED. Real market orders enabled.');
-        alert('🔴 LIVE BROKER MODE ACTIVATED!\nTrades will now execute on your Live MT5 account with Real Capital.\nStrict Stop-Loss (3.0 Pips) is active.');
+        modeText.textContent = `🔴 LIVE MT5 (${this.mt5Online ? 'CONNECTED' : 'STANDALONE'})`;
+        this.log('[MODE] 🔴 LIVE BROKER MODE ACTIVATED. When bot starts, orders are sent to MT5.');
+        if (!this.mt5Online) {
+          alert('Note: MetaTrader 5 Bridge is not detected. Start "Start_Live_MT5_Bot.bat" on your Desktop to place orders directly into your MT5 application.');
+        } else {
+          alert('🔴 LIVE MT5 MODE IS ACTIVE!\nAll trade executions will be placed in your MetaTrader 5 terminal in real time.');
+        }
       } else {
         this.tradingMode = 'DEMO';
         modeBadge.className = 'mode-badge';
@@ -146,7 +188,6 @@ class ForexScalperEngine {
       }
     });
 
-    // Open & Close MT5 Connect Modal
     document.getElementById('btnOpenConnectModal').addEventListener('click', () => {
       document.getElementById('accountModal').style.display = 'flex';
     });
@@ -155,8 +196,7 @@ class ForexScalperEngine {
       document.getElementById('accountModal').style.display = 'none';
     });
 
-    // Save Live MT5 Account
-    document.getElementById('btnSaveLiveAccount').addEventListener('click', () => {
+    document.getElementById('btnSaveLiveAccount').addEventListener('click', async () => {
       const broker = document.getElementById('modalBrokerSelect').value;
       const account = document.getElementById('modalAccountNum').value.trim();
       const password = document.getElementById('modalPassword').value.trim();
@@ -169,17 +209,35 @@ class ForexScalperEngine {
 
       this.liveAccount = { broker, account, server };
       localStorage.setItem('raghav_live_account', JSON.stringify(this.liveAccount));
-      document.getElementById('accountModal').style.display = 'none';
 
+      // Attempt login on local MT5 bridge server if online
+      if (this.mt5Online) {
+        this.log(`[MT5 BRIDGE] Logging into MT5 Account #${account} on ${server}...`);
+        try {
+          const res = await fetch(`${this.apiBase}/api/connect`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ login: account, password, server })
+          });
+          const data = await res.json();
+          if (data.success) {
+            this.log(`[MT5 SUCCESS] Logged into MT5 Account #${account}! Balance: $${data.account.balance}`);
+            alert(`✅ Connected to MT5 Successfully!\n\nAccount: #${account}\nBalance: $${data.account.balance}\nServer: ${server}`);
+          }
+        } catch (e) {
+          this.log(`[MT5 LOGIN NOTICE] Credentials saved locally.`);
+        }
+      } else {
+        alert(`Account credentials saved locally.\nRun "Start_Live_MT5_Bot.bat" on Desktop to start the live connection.`);
+      }
+
+      document.getElementById('accountModal').style.display = 'none';
       this.tradingMode = 'LIVE';
       modeBadge.className = 'mode-badge live';
       modeDot.className = 'mode-dot live';
-      modeText.textContent = `LIVE MT5 (${broker} #${account})`;
-      this.log(`[MT5 LIVE] Connected to ${broker} Account #${account} on ${server}. Live trading active.`);
-      alert(`✅ Live Account Connected Successfully!\n\nBroker: ${broker}\nAccount: ${account}\nServer: ${server}\n\nReal money trading is now ACTIVE in Live Market.`);
+      modeText.textContent = `LIVE MT5 (#${account})`;
     });
 
-    // Manual 1-Click Buy & Sell Buttons
     const btnBuy = document.getElementById('btnManualBuy');
     if (btnBuy) {
       btnBuy.addEventListener('click', () => {
@@ -202,7 +260,6 @@ class ForexScalperEngine {
       });
     }
 
-    // Banner Close Button
     const btnBannerClose = document.getElementById('btnBannerClose');
     if (btnBannerClose) {
       btnBannerClose.addEventListener('click', () => {
@@ -213,12 +270,10 @@ class ForexScalperEngine {
       });
     }
 
-    // Emergency Kill Switch
     document.getElementById('btnKillSwitch').addEventListener('click', () => {
       this.emergencyExit();
     });
 
-    // Forex Pair selector
     document.getElementById('marketSelect').addEventListener('change', (e) => {
       if (this.activeTrade) {
         if (!confirm('A trade is currently open. Changing pair will close it. Proceed?')) {
@@ -230,13 +285,11 @@ class ForexScalperEngine {
       this.initPair(e.target.value);
     });
 
-    // Lot size selector
     document.getElementById('selectLotSize').addEventListener('change', (e) => {
       this.config.lotSize = parseFloat(e.target.value);
       this.log(`[CONFIG] Lot Size set to: ${this.config.lotSize} Lots ($${(this.config.lotSize * 10).toFixed(2)}/pip)`);
     });
 
-    // TP in Pips
     const inputTP = document.getElementById('inputTakeProfit');
     const valTP = document.getElementById('valTakeProfit');
     inputTP.addEventListener('input', (e) => {
@@ -251,7 +304,6 @@ class ForexScalperEngine {
       }
     });
 
-    // SL in Pips
     const inputSL = document.getElementById('inputStopLoss');
     const valSL = document.getElementById('valStopLoss');
     inputSL.addEventListener('input', (e) => {
@@ -266,12 +318,10 @@ class ForexScalperEngine {
       }
     });
 
-    // Trailing SL
     document.getElementById('inputTrailingSL').addEventListener('change', (e) => {
       this.config.useTrailingSL = e.target.checked;
     });
 
-    // Max Spread
     const inputSpread = document.getElementById('inputMaxSpread');
     const valSpread = document.getElementById('valMaxSpread');
     inputSpread.addEventListener('input', (e) => {
@@ -279,7 +329,6 @@ class ForexScalperEngine {
       valSpread.textContent = `${this.config.maxSpreadPips.toFixed(1)} Pips`;
     });
 
-    // Speed
     document.getElementById('selectSpeed').addEventListener('change', (e) => {
       this.config.tickSpeedMs = parseInt(e.target.value);
       if (this.isRunning) {
@@ -288,12 +337,10 @@ class ForexScalperEngine {
       }
     });
 
-    // Audio
     document.getElementById('inputAudioAlerts').addEventListener('change', (e) => {
       this.config.audioEnabled = e.target.checked;
     });
 
-    // Tabs
     const tabButtons = document.querySelectorAll('.tab-btn');
     tabButtons.forEach(btn => {
       btn.addEventListener('click', () => {
@@ -316,7 +363,7 @@ class ForexScalperEngine {
       btn.className = 'btn-toggle-bot running';
       badge.textContent = 'RUNNING';
       badge.className = 'bot-status-badge status-active';
-      const modeText = this.tradingMode === 'LIVE' ? '🔴 LIVE REAL MARKET' : '🧪 DEMO PAPER';
+      const modeText = this.tradingMode === 'LIVE' ? '🔴 LIVE MT5 MARKET' : '🧪 DEMO PAPER';
       this.log(`[BOT] Forex Scalper Started in ${modeText} Mode. Micro-pips scanning active...`);
       this.playSound('start');
       this.timer = setInterval(() => this.processTick(), this.config.tickSpeedMs);
@@ -330,19 +377,36 @@ class ForexScalperEngine {
     }
   }
 
-  processTick() {
+  async processTick() {
     const profile = this.pairProfiles[this.pair];
 
-    // Simulate realistic live Forex tick Brownian drift
-    const drift = (Math.random() - 0.49) * profile.volatility;
-    this.currentBid = +(this.currentBid + drift).toFixed(profile.decimals);
+    // If MT5 Bridge is connected, fetch live prices from MT5
+    if (this.mt5Online) {
+      try {
+        const res = await fetch(`${this.apiBase}/api/price?symbol=${this.pair}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.bid && data.ask) {
+            this.currentBid = +data.bid.toFixed(profile.decimals);
+            this.currentAsk = +data.ask.toFixed(profile.decimals);
+            this.currentSpread = data.spread || +(profile.baseSpread);
+            this.chart.setPrices(this.currentBid, this.currentAsk);
+          }
+        }
+      } catch (e) {
+        // Fallback to Brownian drift simulation
+      }
+    }
 
-    // Live spread fluctuation
-    this.currentSpread = +(profile.baseSpread + (Math.random() - 0.4) * 0.3).toFixed(1);
-    this.currentAsk = +(this.currentBid + (this.currentSpread / profile.pipMult)).toFixed(profile.decimals);
-    this.chart.setPrices(this.currentBid, this.currentAsk);
+    // Brownian drift tick simulation if MT5 market is closed or standalone
+    if (!this.mt5Online) {
+      const drift = (Math.random() - 0.49) * profile.volatility;
+      this.currentBid = +(this.currentBid + drift).toFixed(profile.decimals);
+      this.currentSpread = +(profile.baseSpread + (Math.random() - 0.4) * 0.3).toFixed(1);
+      this.currentAsk = +(this.currentBid + (this.currentSpread / profile.pipMult)).toFixed(profile.decimals);
+      this.chart.setPrices(this.currentBid, this.currentAsk);
+    }
 
-    // Micro-candle building
     let currentCandle = this.candles[this.candles.length - 1];
     if (!currentCandle.tickCount) currentCandle.tickCount = 0;
     currentCandle.tickCount++;
@@ -369,7 +433,6 @@ class ForexScalperEngine {
     this.recalculateIndicators();
     this.updateHeaderUI();
 
-    // Check Cooldown
     if (Date.now() < this.stats.inCooldownUntil) {
       const remainingSec = Math.ceil((this.stats.inCooldownUntil - Date.now()) / 1000);
       const badge = document.getElementById('botStatusBadge');
@@ -383,12 +446,9 @@ class ForexScalperEngine {
       badge.className = 'bot-status-badge status-active';
     }
 
-    // 1. Manage Active Position
     if (this.activeTrade) {
       this.manageOpenTrade();
-    }
-    // 2. Automated Signal Detection
-    else if (this.isRunning) {
+    } else if (this.isRunning) {
       this.evaluateSignal();
     }
 
@@ -471,7 +531,6 @@ class ForexScalperEngine {
     const current = this.candles[len - 1];
     const prev = this.candles[len - 2];
 
-    // Bullish Confluence
     const emaBullish = current.ema9 > current.ema21 && prev.ema9 <= prev.ema21;
     const priceAboveVwap = current.close >= current.vwap;
     const rsiGoodBull = current.rsi >= 46 && current.rsi <= 64;
@@ -481,7 +540,6 @@ class ForexScalperEngine {
       return;
     }
 
-    // Bearish Confluence (Short Scalp)
     const emaBearish = current.ema9 < current.ema21 && prev.ema9 >= prev.ema21;
     const priceBelowVwap = current.close <= current.vwap;
     const rsiGoodBear = current.rsi <= 54 && current.rsi >= 36;
@@ -491,7 +549,7 @@ class ForexScalperEngine {
     }
   }
 
-  executeEntry(side, entryPrice, reason) {
+  async executeEntry(side, entryPrice, reason) {
     const profile = this.pairProfiles[this.pair];
     const tpDist = this.config.takeProfitPips / profile.pipMult;
     const slDist = this.config.stopLossPips / profile.pipMult;
@@ -505,8 +563,41 @@ class ForexScalperEngine {
       ? +(entryPrice - slDist).toFixed(profile.decimals)
       : +(entryPrice + slDist).toFixed(profile.decimals);
 
+    let mt5Ticket = null;
+
+    // Direct Live MT5 Execution Bridge
+    if (this.tradingMode === 'LIVE' && this.mt5Online) {
+      this.log(`[MT5 BRIDGE] Submitting LIVE order to MT5: ${side} ${this.pair} (${this.config.lotSize} Lots)...`);
+      try {
+        const orderRes = await fetch(`${this.apiBase}/api/order`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            symbol: this.pair,
+            side: side,
+            lots: this.config.lotSize,
+            tp_pips: this.config.takeProfitPips,
+            sl_pips: this.config.stopLossPips
+          })
+        });
+        const orderData = await orderRes.json();
+        if (orderData.success) {
+          mt5Ticket = orderData.ticket;
+          entryPrice = orderData.price || entryPrice;
+          this.log(`[MT5 LIVE SUCCESS] Order executed in MT5 Terminal! Ticket #${mt5Ticket} @ ${entryPrice}`);
+        } else {
+          this.log(`[MT5 ERROR] Order rejected by broker: ${orderData.error}`);
+          alert(`MT5 Order Rejected: ${orderData.error}`);
+          return;
+        }
+      } catch (err) {
+        this.log(`[MT5 BRIDGE ERROR] Could not reach MT5 Server: ${err.message}`);
+      }
+    }
+
     this.activeTrade = {
-      id: 'FX-' + Math.floor(1000 + Math.random() * 9000),
+      id: mt5Ticket ? `MT5-#${mt5Ticket}` : ('FX-' + Math.floor(1000 + Math.random() * 9000)),
+      ticket: mt5Ticket,
       time: new Date().toLocaleTimeString(),
       pair: this.pair,
       type: side,
@@ -584,7 +675,6 @@ class ForexScalperEngine {
       }
     }
 
-    // 1. Take Profit Trigger
     const isTakeProfitHit = isBuy 
       ? (trade.currentPrice >= trade.takeProfitPrice) 
       : (trade.currentPrice <= trade.takeProfitPrice);
@@ -594,7 +684,6 @@ class ForexScalperEngine {
       return;
     }
 
-    // 2. Stop Loss Trigger
     const isStopLossHit = isBuy 
       ? (trade.currentPrice <= trade.stopLossPrice) 
       : (trade.currentPrice >= trade.stopLossPrice);
@@ -610,9 +699,28 @@ class ForexScalperEngine {
     }
   }
 
-  closeActiveTrade(exitPrice, exitReason) {
+  async closeActiveTrade(exitPrice, exitReason) {
     const trade = this.activeTrade;
     if (!trade) return;
+
+    // Send closing order to MetaTrader 5 if real position
+    if (trade.ticket && this.mt5Online) {
+      try {
+        this.log(`[MT5 BRIDGE] Closing MT5 Ticket #${trade.ticket} on broker server...`);
+        const closeRes = await fetch(`${this.apiBase}/api/close`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ticket: trade.ticket, symbol: trade.pair })
+        });
+        const closeData = await closeRes.json();
+        if (closeData.success) {
+          this.log(`[MT5 LIVE SUCCESS] Position #${trade.ticket} closed in MT5 Terminal at ${closeData.close_price}`);
+          exitPrice = closeData.close_price || exitPrice;
+        }
+      } catch (err) {
+        this.log(`[MT5 ERROR] Could not send close to MT5: ${err.message}`);
+      }
+    }
 
     const profile = this.pairProfiles[this.pair];
     const isBuy = trade.type === 'BUY';
@@ -625,6 +733,7 @@ class ForexScalperEngine {
 
     const record = {
       id: trade.id,
+      ticket: trade.ticket,
       time: new Date().toLocaleTimeString(),
       pair: trade.pair,
       type: trade.type,
@@ -640,7 +749,6 @@ class ForexScalperEngine {
 
     this.tradeHistory.unshift(record);
 
-    // Update Statistics
     this.stats.totalTrades++;
     this.stats.netUSD += netUSD;
     this.stats.netPips += pipsGained;
@@ -754,7 +862,6 @@ class ForexScalperEngine {
     const usdDiff = +(pipsDiff * (trade.lotSize * 10.0)).toFixed(2);
     const isProfit = pipsDiff >= 0;
 
-    // Update Top Banner
     if (banner) {
       banner.style.display = 'flex';
       const badgeEl = document.getElementById('bannerTradeType');
@@ -775,11 +882,10 @@ class ForexScalperEngine {
       usdEl.className = isProfit ? 'price-up' : 'price-down';
     }
 
-    // Update Table
     tbody.innerHTML = `
       <tr>
         <td>${trade.time}</td>
-        <td><b>${trade.pair}</b></td>
+        <td><b>${trade.pair}</b> ${trade.ticket ? `<span style="font-size:10px; color:var(--green);">(#${trade.ticket})</span>` : ''}</td>
         <td><span class="${isBuy ? 'badge-buy' : 'badge-sell'}">${trade.type}</span></td>
         <td><b>${trade.lotSize} Lots</b></td>
         <td>${trade.entryPrice.toFixed(profile.decimals)}</td>
