@@ -1,0 +1,24 @@
+{
+  "trading_mode": "DEMO",
+  "broker_info": {
+    "supported_brokers": "Exness, XM, IC Markets, OctaFX, Pepperstone, FXTM",
+    "mt5_account_number": 12345678,
+    "mt5_password": "YOUR_MT5_PASSWORD_HERE",
+    "mt5_server": "Exness-MT5Real"
+  },
+  "scalping_strategy": {
+    "pair": "EURUSD",
+    "lot_size": 0.10,
+    "take_profit_pips": 5.0,
+    "stop_loss_pips": 3.0,
+    "use_trailing_stop": true,
+    "trailing_start_pips": 2.5,
+    "trailing_step_pips": 1.5,
+    "max_spread_pips": 1.2
+  },
+  "risk_management": {
+    "max_daily_loss_usd": 50.00,
+    "max_consecutive_losses": 2,
+    "cooldown_minutes": 3
+  }
+}
