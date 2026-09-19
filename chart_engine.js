@@ -86,7 +86,7 @@ class TradingChart {
       ctx.fillStyle = '#54657e';
       ctx.font = '14px Inter, sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText('Forex டிக் தரவு ஏற்றப்படுகிறது (Streaming Forex Ticks)...', w / 2, h / 2);
+      ctx.fillText('Streaming Forex Market Ticks...', w / 2, h / 2);
       return;
     }
 
