@@ -4,26 +4,31 @@ Raghav Forex Scalper AI is an automated, high-speed algorithmic scalping system 
 
 ---
 
-## 🚀 How to Run Live Trading with MetaTrader 5
+## 🚀 Dual Mode: Demo & Live Trading with MetaTrader 5
 
-You can trade live directly on your MetaTrader 5 broker account:
+You can run the bot in **Demo Mode** (zero risk) or **Live Mode** (real money):
 
-1. **Launch the Bot**:
-   - Double-click **`⚡ Start Raghav MT5 Scalper.bat`** on your Desktop.
-   - (Or run `Start_Live_MT5_Bot.bat` in `C:\Users\srira\Desktop\Raghav_Trading_Bot\`).
-2. **Web Terminal Opens Automatically**:
-   - The terminal loads in your browser at `http://127.0.0.1:5000/`.
-   - The top header will display **`🟢 MT5 LINKED (LIVE)`** showing your live balance and equity.
-3. **Connect Your Live Broker Account**:
-   - Click **`🔑 CONNECT MT5 LIVE`** in the header.
-   - Enter your MT5 Account Number, Password, and Broker Server (e.g., `Exness-Real`, `ICMarkets-Live`, `XMGlobal-Real`).
-   - Credentials are stored securely on your local machine and never hardcoded.
-4. **Start Automated Scalping**:
-   - Switch the mode badge to **`🔴 LIVE MT5`**.
-   - Click the green **"▶ START FOREX SCALPER"** button.
-   - As soon as market conditions align (RSI, EMA 9/21, MACD), the bot submits real market orders directly into your MetaTrader 5 terminal with broker-side Stop Loss and Take Profit!
-5. **Manual 1-Click Execution**:
-   - You can also click **`▲ BUY MARKET`** or **`▼ SELL MARKET`** for immediate 1-click execution into MT5.
+### 1. 🧪 Connect MT5 Demo Broker Account (Practice Mode)
+- Click **`🧪 CONNECT DEMO`** in the header.
+- Select your demo broker (e.g., `MetaQuotes-Demo`, `Exness-MT5Trial`, `XMGlobal-Demo`, `ICMarketsSC-Demo`, `Octa-Demo`).
+- Enter your **MT5 Demo Account Number**, **Password**, and **Server**.
+- The bot connects to MT5 and executes automated scalping orders using **virtual broker funds** with live broker ticks!
+
+### 2. ⚡ 1-Click Instant Paper Demo ($10,000 Virtual Capital)
+- Click **`🧪 CONNECT DEMO`** &rarr; select **`⚡ 1-CLICK PAPER DEMO`**.
+- Click **`Activate Instant Paper Demo`** to trade immediately with $10,000 virtual balance.
+- **Zero broker login required**: runs high-speed client-side simulation.
+
+### 3. 🔴 Connect Real Live MT5 Account (Real Money)
+- Click **`🔑 CONNECT MT5 LIVE`** in the header.
+- Enter your live broker login, password, and server.
+- Switch the mode badge to **`🔴 LIVE MT5`**.
+- The bot executes real market orders in MT5 with strict 3-Pip Stop Loss & 5-Pip Take Profit.
+
+### 4. How to Launch
+1. Double-click **`Start_Raghav_MT5_Scalper.bat`** on your Desktop.
+2. The terminal automatically opens in your browser at `http://127.0.0.1:5000/`.
+3. Choose **DEMO** or **LIVE**, then click **`▶ START FOREX SCALPER`**!
 
 ---
 
