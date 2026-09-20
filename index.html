@@ -45,13 +45,16 @@
       </div>
     </div>
 
-    <!-- Mode Badge & Panic Kill Switch -->
+    <!-- Mode Badge & Connection Actions -->
     <div class="header-actions">
-      <button class="mode-badge" id="modeBadge" title="Click to switch between Demo and Live Mode">
+      <button class="mode-badge" id="modeBadge" title="Click to cycle between Paper Demo, MT5 Demo, and MT5 Live">
         <div class="mode-dot" id="modeDot"></div>
         <span id="modeText">DEMO ($10,000)</span>
       </button>
-      <button class="mode-badge" id="btnOpenConnectModal" style="background: var(--bg-tertiary); color: var(--text-primary); border-color: var(--border-color);" title="Configure Live Forex Broker">
+      <button class="mode-badge demo-connect-btn" id="btnOpenDemoModal" style="background: rgba(0, 230, 118, 0.12); color: var(--green); border-color: var(--green);" title="Connect MT5 Demo or Instant Paper Demo">
+        🧪 CONNECT DEMO
+      </button>
+      <button class="mode-badge live-connect-btn" id="btnOpenConnectModal" style="background: rgba(255, 61, 113, 0.12); color: #ff3d71; border-color: var(--red);" title="Configure Live Real-Money Forex Broker">
         🔑 CONNECT MT5 LIVE
       </button>
       <button class="btn-kill-switch" id="btnKillSwitch" title="Close all positions immediately">
@@ -320,53 +323,139 @@
     </div>
   </div>
 
-  <!-- MT5 Live Account Connection Modal -->
+  <!-- MT5 Account Connection Modal (Demo & Live) -->
   <div class="modal-overlay" id="accountModal" style="display: none;">
     <div class="modal-box">
       <div class="modal-header">
         <div class="modal-title">
-          <span>⚡ Connect Live MT5 Forex Broker</span>
+          <span id="modalMainTitle">⚡ MT5 & Account Connection Manager</span>
         </div>
         <button class="btn-close-modal" id="btnCloseModal">&times;</button>
       </div>
-      <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
-        Connect your MetaTrader 5 live account (Exness, XM, IC Markets, OctaFX, etc.) for real-money trade execution.
-      </div>
 
-      <div class="control-group">
-        <label class="control-label">Forex Broker</label>
-        <select id="modalBrokerSelect" class="input-control">
-          <option value="Exness">Exness (Exness-MT5Real)</option>
-          <option value="XM">XM Global (XMGlobal-Real)</option>
-          <option value="ICMarkets">IC Markets (ICMarketsSC-Live)</option>
-          <option value="OctaFX">OctaFX (Octa-Real)</option>
-          <option value="Other">Other MT5 Broker</option>
-        </select>
-      </div>
-
-      <div class="control-group">
-        <label class="control-label">MT5 Account Number / Login ID</label>
-        <input type="number" id="modalAccountNum" class="input-control" placeholder="e.g. 10293847">
-      </div>
-
-      <div class="control-group">
-        <label class="control-label">Trading Password</label>
-        <input type="password" id="modalPassword" class="input-control" placeholder="••••••••••••">
-      </div>
-
-      <div class="control-group">
-        <label class="control-label">MT5 Server Name</label>
-        <input type="text" id="modalServer" class="input-control" value="Exness-MT5Real" placeholder="e.g. Exness-MT5Real7">
-      </div>
-
-      <div style="background: rgba(255, 171, 0, 0.1); border: 1px solid var(--yellow); padding: 10px; border-radius: 6px; font-size: 11px; color: var(--yellow); margin: 12px 0;">
-        ⚠️ <b>Real Money Risk Protection:</b> Strict Stop Loss (3 pips) & Daily Loss Circuit Breaker are enforced on all live market trades.
-      </div>
-
-      <div style="display: flex; gap: 10px; margin-top: 14px;">
-        <button id="btnSaveLiveAccount" style="flex: 1; background: var(--green); color: #000; font-weight: 700; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">
-          SAVE & ACTIVATE LIVE BROKER
+      <!-- Navigation Tabs -->
+      <div class="modal-tabs">
+        <button type="button" class="modal-tab-btn tab-demo active" id="modalTabBtnDemo">
+          🧪 MT5 DEMO BROKER
         </button>
+        <button type="button" class="modal-tab-btn tab-paper" id="modalTabBtnPaper">
+          ⚡ 1-CLICK PAPER DEMO
+        </button>
+        <button type="button" class="modal-tab-btn tab-live" id="modalTabBtnLive">
+          🔴 MT5 REAL LIVE
+        </button>
+      </div>
+
+      <!-- TAB 1: MT5 Demo Broker Form -->
+      <div id="modalTabDemoContent" class="modal-tab-content">
+        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
+          Connect your MetaTrader 5 <b>Demo / Practice</b> broker account to test algorithmic scalper orders on live broker feeds with <b>zero real-money risk</b>.
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Demo Forex Broker</label>
+          <select id="modalDemoBrokerSelect" class="input-control">
+            <option value="MetaQuotes" data-server="MetaQuotes-Demo">MetaQuotes Official Demo (MetaQuotes-Demo)</option>
+            <option value="Exness" data-server="Exness-MT5Trial">Exness Demo (Exness-MT5Trial)</option>
+            <option value="XM" data-server="XMGlobal-Demo">XM Global Demo (XMGlobal-Demo)</option>
+            <option value="ICMarkets" data-server="ICMarketsSC-Demo">IC Markets Demo (ICMarketsSC-Demo)</option>
+            <option value="OctaFX" data-server="Octa-Demo">OctaFX Demo (Octa-Demo)</option>
+            <option value="Pepperstone" data-server="Pepperstone-Demo">Pepperstone Demo (Pepperstone-Demo)</option>
+            <option value="Other" data-server="">Other MT5 Demo Server</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">MT5 Demo Account / Login ID</label>
+          <input type="number" id="modalDemoAccountNum" class="input-control" placeholder="e.g. 50987654">
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Demo Trading Password</label>
+          <input type="password" id="modalDemoPassword" class="input-control" placeholder="••••••••••••">
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">MT5 Demo Server Name</label>
+          <input type="text" id="modalDemoServer" class="input-control" value="MetaQuotes-Demo" placeholder="e.g. MetaQuotes-Demo">
+        </div>
+
+        <div style="background: rgba(0, 230, 118, 0.1); border: 1px solid var(--green); padding: 10px; border-radius: 6px; font-size: 11px; color: var(--green); margin: 12px 0;">
+          🧪 <b>Zero Risk Practice:</b> Orders execute directly inside your MT5 demo terminal using virtual broker funds.
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button id="btnSaveDemoAccount" style="flex: 1; background: var(--green); color: #000; font-weight: 700; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">
+            🧪 CONNECT MT5 DEMO ACCOUNT
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 2: 1-Click Instant Paper Demo -->
+      <div id="modalTabPaperContent" class="modal-tab-content" style="display: none;">
+        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
+          Practice immediately without any MT5 broker account or login. Pure high-speed browser simulation with virtual capital.
+        </div>
+
+        <div style="background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 8px; padding: 16px; text-align: center; margin-bottom: 14px;">
+          <div style="font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">Starting Virtual Demo Capital</div>
+          <div style="font-size: 28px; font-weight: 800; font-family: var(--font-mono); color: var(--blue); margin: 6px 0;">$10,000.00 USD</div>
+          <div style="font-size: 11px; color: var(--text-secondary);">Brownian drift tick stream &bull; 60 FPS real-time indicators &bull; 0% real risk</div>
+        </div>
+
+        <div style="background: rgba(41, 121, 255, 0.1); border: 1px solid var(--blue); padding: 10px; border-radius: 6px; font-size: 11px; color: #82b1ff; margin: 12px 0;">
+          ⚡ <b>1-Click Instant Setup:</b> Test the 3-Pip SL & 5-Pip TP scalping strategy instantly with zero configuration.
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button id="btnActivatePaperDemo" style="flex: 1; background: var(--blue); color: #fff; font-weight: 700; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">
+            ⚡ ACTIVATE INSTANT PAPER DEMO ($10,000)
+          </button>
+        </div>
+      </div>
+
+      <!-- TAB 3: MT5 Real Live Form -->
+      <div id="modalTabLiveContent" class="modal-tab-content" style="display: none;">
+        <div style="font-size: 12px; color: var(--text-secondary); margin-bottom: 14px;">
+          Connect your MetaTrader 5 <b>Real Live</b> broker account (Exness, XM, IC Markets, OctaFX, etc.) for real-money trade execution.
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Forex Broker</label>
+          <select id="modalBrokerSelect" class="input-control">
+            <option value="Exness" data-server="Exness-MT5Real">Exness (Exness-MT5Real)</option>
+            <option value="XM" data-server="XMGlobal-Real">XM Global (XMGlobal-Real)</option>
+            <option value="ICMarkets" data-server="ICMarketsSC-Live">IC Markets (ICMarketsSC-Live)</option>
+            <option value="OctaFX" data-server="Octa-Real">OctaFX (Octa-Real)</option>
+            <option value="Pepperstone" data-server="Pepperstone-Live">Pepperstone (Pepperstone-Live)</option>
+            <option value="Other" data-server="">Other MT5 Broker</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">MT5 Live Account / Login ID</label>
+          <input type="number" id="modalAccountNum" class="input-control" placeholder="e.g. 10293847">
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">Live Trading Password</label>
+          <input type="password" id="modalPassword" class="input-control" placeholder="••••••••••••">
+        </div>
+
+        <div class="control-group">
+          <label class="control-label">MT5 Live Server Name</label>
+          <input type="text" id="modalServer" class="input-control" value="Exness-MT5Real" placeholder="e.g. Exness-MT5Real7">
+        </div>
+
+        <div style="background: rgba(255, 61, 113, 0.1); border: 1px solid var(--red); padding: 10px; border-radius: 6px; font-size: 11px; color: #ff80ab; margin: 12px 0;">
+          ⚠️ <b>Real Money Risk:</b> Orders execute in real market conditions. Strict Stop Loss (3 pips) & Daily Loss Circuit Breaker are enforced.
+        </div>
+
+        <div style="display: flex; gap: 10px; margin-top: 14px;">
+          <button id="btnSaveLiveAccount" style="flex: 1; background: var(--red); color: #fff; font-weight: 700; padding: 12px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px;">
+            🔴 SAVE & ACTIVATE REAL LIVE BROKER
+          </button>
+        </div>
       </div>
     </div>
   </div>
