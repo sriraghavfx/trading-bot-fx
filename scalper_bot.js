@@ -26,6 +26,11 @@ class ForexScalperEngine {
     this.mt5Account = null;
 
     try {
+      this.demoAccount = JSON.parse(localStorage.getItem('raghav_demo_account') || 'null');
+    } catch (e) {
+      this.demoAccount = null;
+    }
+    try {
       this.liveAccount = JSON.parse(localStorage.getItem('raghav_live_account') || 'null');
     } catch (e) {
       this.liveAccount = null;
@@ -85,19 +90,21 @@ class ForexScalperEngine {
       if (res.ok) {
         const data = await res.json();
         if (data.connected) {
+          const isDemo = (data.account && data.account.trade_mode === 'DEMO');
           if (!this.mt5Online) {
-            this.log('[MT5 LINKED] 🟢 MetaTrader 5 Terminal connected! Live orders enabled.');
+            this.log(`[MT5 LINKED] 🟢 MetaTrader 5 Terminal connected! (${isDemo ? 'DEMO PRACTICE' : 'REAL LIVE'})`);
           }
           this.mt5Online = true;
           this.mt5Account = data.account;
           if (tag) {
-            tag.textContent = '🟢 MT5 LINKED (LIVE)';
-            tag.style.color = '#00e676';
-            tag.style.borderColor = '#00e676';
-            tag.style.background = 'rgba(0, 230, 118, 0.15)';
+            tag.textContent = isDemo ? '🟢 MT5 LINKED (DEMO)' : '🟢 MT5 LINKED (LIVE)';
+            tag.style.color = isDemo ? '#00e676' : '#ff3d71';
+            tag.style.borderColor = isDemo ? '#00e676' : '#ff3d71';
+            tag.style.background = isDemo ? 'rgba(0, 230, 118, 0.15)' : 'rgba(255, 61, 113, 0.15)';
           }
           if (balEl && data.account) {
-            balEl.textContent = `| Balance: $${data.account.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} (Equity: $${data.account.equity.toLocaleString('en-US', { minimumFractionDigits: 2 })})`;
+            const lbl = isDemo ? 'Demo' : 'Real';
+            balEl.textContent = `| ${lbl} Bal: $${data.account.balance.toLocaleString('en-US', { minimumFractionDigits: 2 })} (Eq: $${data.account.equity.toLocaleString('en-US', { minimumFractionDigits: 2 })})`;
           }
           return;
         }
@@ -108,7 +115,7 @@ class ForexScalperEngine {
 
     this.mt5Online = false;
     if (tag) {
-      tag.textContent = '🟡 STANDALONE (SIM)';
+      tag.textContent = '🟡 STANDALONE (PAPER)';
       tag.style.color = '#ffab00';
       tag.style.borderColor = '#ffab00';
       tag.style.background = 'rgba(255, 171, 0, 0.15)';
@@ -167,35 +174,183 @@ class ForexScalperEngine {
     const modeDot = document.getElementById('modeDot');
     const modeText = document.getElementById('modeText');
 
-    modeBadge.addEventListener('click', () => {
-      if (this.tradingMode === 'DEMO') {
-        this.tradingMode = 'LIVE';
+    const updateModeUI = () => {
+      if (this.tradingMode === 'LIVE') {
         modeBadge.className = 'mode-badge live';
         modeDot.className = 'mode-dot live';
-        modeText.textContent = `🔴 LIVE MT5 (${this.mt5Online ? 'CONNECTED' : 'STANDALONE'})`;
-        this.log('[MODE] 🔴 LIVE BROKER MODE ACTIVATED. When bot starts, orders are sent to MT5.');
-        if (!this.mt5Online) {
-          alert('Note: MetaTrader 5 Bridge is not detected. Start "Start_Live_MT5_Bot.bat" on your Desktop to place orders directly into your MT5 application.');
-        } else {
-          alert('🔴 LIVE MT5 MODE IS ACTIVE!\nAll trade executions will be placed in your MetaTrader 5 terminal in real time.');
-        }
+        const num = (this.liveAccount && this.liveAccount.account) ? ` (#${this.liveAccount.account})` : '';
+        modeText.textContent = `🔴 LIVE MT5${num}`;
+      } else if (this.tradingMode === 'MT5_DEMO') {
+        modeBadge.className = 'mode-badge demo';
+        modeDot.className = 'mode-dot demo';
+        const num = (this.demoAccount && this.demoAccount.account) ? ` (#${this.demoAccount.account})` : '';
+        modeText.textContent = `🧪 MT5 DEMO${num}`;
       } else {
-        this.tradingMode = 'DEMO';
         modeBadge.className = 'mode-badge';
         modeDot.className = 'mode-dot';
         modeText.textContent = 'DEMO ($10,000)';
-        this.log('[MODE] 🧪 DEMO PAPER TRADING MODE ACTIVATED.');
+      }
+    };
+
+    // Helper to open modal on specific tab
+    const openModalWithTab = (tabName) => {
+      const modal = document.getElementById('accountModal');
+      if (!modal) return;
+      modal.style.display = 'flex';
+
+      const tabDemoBtn = document.getElementById('modalTabBtnDemo');
+      const tabPaperBtn = document.getElementById('modalTabBtnPaper');
+      const tabLiveBtn = document.getElementById('modalTabBtnLive');
+      const contentDemo = document.getElementById('modalTabDemoContent');
+      const contentPaper = document.getElementById('modalTabPaperContent');
+      const contentLive = document.getElementById('modalTabLiveContent');
+
+      if (tabDemoBtn) tabDemoBtn.className = 'modal-tab-btn tab-demo' + (tabName === 'demo' ? ' active' : '');
+      if (tabPaperBtn) tabPaperBtn.className = 'modal-tab-btn tab-paper' + (tabName === 'paper' ? ' active' : '');
+      if (tabLiveBtn) tabLiveBtn.className = 'modal-tab-btn tab-live' + (tabName === 'live' ? ' active' : '');
+
+      if (contentDemo) contentDemo.style.display = tabName === 'demo' ? 'block' : 'none';
+      if (contentPaper) contentPaper.style.display = tabName === 'paper' ? 'block' : 'none';
+      if (contentLive) contentLive.style.display = tabName === 'live' ? 'block' : 'none';
+
+      // Pre-fill existing demo or live saved values
+      if (tabName === 'demo' && this.demoAccount) {
+        if (this.demoAccount.broker) document.getElementById('modalDemoBrokerSelect').value = this.demoAccount.broker;
+        if (this.demoAccount.account) document.getElementById('modalDemoAccountNum').value = this.demoAccount.account;
+        if (this.demoAccount.server) document.getElementById('modalDemoServer').value = this.demoAccount.server;
+      } else if (tabName === 'live' && this.liveAccount) {
+        if (this.liveAccount.broker) document.getElementById('modalBrokerSelect').value = this.liveAccount.broker;
+        if (this.liveAccount.account) document.getElementById('modalAccountNum').value = this.liveAccount.account;
+        if (this.liveAccount.server) document.getElementById('modalServer').value = this.liveAccount.server;
+      }
+    };
+
+    // Cycle modes on clicking modeBadge
+    modeBadge.addEventListener('click', () => {
+      if (this.tradingMode === 'DEMO') {
+        if (this.demoAccount) {
+          this.tradingMode = 'MT5_DEMO';
+          updateModeUI();
+          this.log(`[MODE] 🧪 Switched to MT5 DEMO Broker Mode (#${this.demoAccount.account}).`);
+        } else if (this.liveAccount) {
+          this.tradingMode = 'LIVE';
+          updateModeUI();
+          this.log(`[MODE] 🔴 Switched to REAL LIVE MT5 Broker Mode (#${this.liveAccount.account}).`);
+        } else {
+          openModalWithTab('demo');
+        }
+      } else if (this.tradingMode === 'MT5_DEMO') {
+        if (this.liveAccount) {
+          this.tradingMode = 'LIVE';
+          updateModeUI();
+          this.log(`[MODE] 🔴 Switched to REAL LIVE MT5 Broker Mode (#${this.liveAccount.account}).`);
+        } else {
+          this.tradingMode = 'DEMO';
+          updateModeUI();
+          this.log('[MODE] 🧪 Switched to 1-Click Instant Paper Demo ($10,000).');
+        }
+      } else {
+        this.tradingMode = 'DEMO';
+        updateModeUI();
+        this.log('[MODE] 🧪 Switched to 1-Click Instant Paper Demo ($10,000).');
       }
     });
 
-    document.getElementById('btnOpenConnectModal').addEventListener('click', () => {
-      document.getElementById('accountModal').style.display = 'flex';
-    });
+    // Header buttons
+    const btnOpenDemo = document.getElementById('btnOpenDemoModal');
+    if (btnOpenDemo) {
+      btnOpenDemo.addEventListener('click', () => openModalWithTab('demo'));
+    }
+
+    const btnOpenLive = document.getElementById('btnOpenConnectModal');
+    if (btnOpenLive) {
+      btnOpenLive.addEventListener('click', () => openModalWithTab('live'));
+    }
+
+    // Modal navigation tabs
+    const tabDemo = document.getElementById('modalTabBtnDemo');
+    if (tabDemo) tabDemo.addEventListener('click', () => openModalWithTab('demo'));
+    const tabPaper = document.getElementById('modalTabBtnPaper');
+    if (tabPaper) tabPaper.addEventListener('click', () => openModalWithTab('paper'));
+    const tabLive = document.getElementById('modalTabBtnLive');
+    if (tabLive) tabLive.addEventListener('click', () => openModalWithTab('live'));
+
+    // Auto-fill Demo Server on broker dropdown change
+    const demoBrokerSel = document.getElementById('modalDemoBrokerSelect');
+    if (demoBrokerSel) {
+      demoBrokerSel.addEventListener('change', (e) => {
+        const selected = e.target.options[e.target.selectedIndex];
+        const srv = selected.getAttribute('data-server');
+        if (srv) document.getElementById('modalDemoServer').value = srv;
+      });
+    }
+
+    // Auto-fill Live Server on broker dropdown change
+    const liveBrokerSel = document.getElementById('modalBrokerSelect');
+    if (liveBrokerSel) {
+      liveBrokerSel.addEventListener('change', (e) => {
+        const selected = e.target.options[e.target.selectedIndex];
+        const srv = selected.getAttribute('data-server');
+        if (srv) document.getElementById('modalServer').value = srv;
+      });
+    }
 
     document.getElementById('btnCloseModal').addEventListener('click', () => {
       document.getElementById('accountModal').style.display = 'none';
     });
 
+    // Connect MT5 Demo Account
+    document.getElementById('btnSaveDemoAccount').addEventListener('click', async () => {
+      const broker = document.getElementById('modalDemoBrokerSelect').value;
+      const account = document.getElementById('modalDemoAccountNum').value.trim();
+      const password = document.getElementById('modalDemoPassword').value.trim();
+      const server = document.getElementById('modalDemoServer').value.trim();
+
+      if (!account) {
+        alert('Please enter your MT5 Demo Account Number / Login ID.');
+        return;
+      }
+
+      this.demoAccount = { broker, account, server };
+      localStorage.setItem('raghav_demo_account', JSON.stringify(this.demoAccount));
+
+      if (this.mt5Online) {
+        this.log(`[MT5 BRIDGE] Logging into MT5 Demo Account #${account} on ${server}...`);
+        try {
+          const res = await fetch(`${this.apiBase}/api/connect`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ login: account, password, server, isDemo: true })
+          });
+          const data = await res.json();
+          if (data.success) {
+            this.log(`[MT5 DEMO SUCCESS] Connected to MT5 Demo Account #${account}! Balance: $${data.account.balance}`);
+            alert(`✅ Connected to MT5 Demo Successfully!\n\nAccount: #${account}\nBalance: $${data.account.balance}\nServer: ${server}\n\nVirtual broker funds are ready for practice trading!`);
+          } else {
+            alert(`MT5 Demo Login Failed: ${data.error || 'Check login ID, password, or server'}`);
+          }
+        } catch (e) {
+          this.log(`[MT5 LOGIN NOTICE] Demo credentials saved locally.`);
+        }
+      } else {
+        alert(`MT5 Demo credentials saved locally.\nStart "Start_Raghav_MT5_Scalper.bat" to connect directly with MetaTrader 5.`);
+      }
+
+      document.getElementById('accountModal').style.display = 'none';
+      this.tradingMode = 'MT5_DEMO';
+      updateModeUI();
+    });
+
+    // Activate 1-Click Instant Paper Demo
+    document.getElementById('btnActivatePaperDemo').addEventListener('click', () => {
+      this.tradingMode = 'DEMO';
+      updateModeUI();
+      this.log('[MODE] ⚡ Activated 1-Click Instant Paper Demo ($10,000 Virtual Capital). Zero risk.');
+      document.getElementById('accountModal').style.display = 'none';
+      alert('✅ 1-Click Paper Demo Activated!\n\nStarting Virtual Balance: $10,000.00 USD\nYou can now click "▶ START FOREX SCALPER" to test the strategy risk-free.');
+    });
+
+    // Save & Connect MT5 Live Account
     document.getElementById('btnSaveLiveAccount').addEventListener('click', async () => {
       const broker = document.getElementById('modalBrokerSelect').value;
       const account = document.getElementById('modalAccountNum').value.trim();
@@ -212,30 +367,30 @@ class ForexScalperEngine {
 
       // Attempt login on local MT5 bridge server if online
       if (this.mt5Online) {
-        this.log(`[MT5 BRIDGE] Logging into MT5 Account #${account} on ${server}...`);
+        this.log(`[MT5 BRIDGE] Logging into MT5 Live Account #${account} on ${server}...`);
         try {
           const res = await fetch(`${this.apiBase}/api/connect`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ login: account, password, server })
+            body: JSON.stringify({ login: account, password, server, isDemo: false })
           });
           const data = await res.json();
           if (data.success) {
-            this.log(`[MT5 SUCCESS] Logged into MT5 Account #${account}! Balance: $${data.account.balance}`);
+            this.log(`[MT5 LIVE SUCCESS] Logged into MT5 Live Account #${account}! Balance: $${data.account.balance}`);
             alert(`✅ Connected to MT5 Successfully!\n\nAccount: #${account}\nBalance: $${data.account.balance}\nServer: ${server}`);
+          } else {
+            alert(`MT5 Live Login Failed: ${data.error || 'Check login ID, password, or server'}`);
           }
         } catch (e) {
           this.log(`[MT5 LOGIN NOTICE] Credentials saved locally.`);
         }
       } else {
-        alert(`Account credentials saved locally.\nRun "Start_Live_MT5_Bot.bat" on Desktop to start the live connection.`);
+        alert(`Account credentials saved locally.\nRun "Start_Raghav_MT5_Scalper.bat" on Desktop to start the live connection.`);
       }
 
       document.getElementById('accountModal').style.display = 'none';
       this.tradingMode = 'LIVE';
-      modeBadge.className = 'mode-badge live';
-      modeDot.className = 'mode-dot live';
-      modeText.textContent = `LIVE MT5 (#${account})`;
+      updateModeUI();
     });
 
     const btnBuy = document.getElementById('btnManualBuy');
@@ -565,9 +720,11 @@ class ForexScalperEngine {
 
     let mt5Ticket = null;
 
-    // Direct Live MT5 Execution Bridge
-    if (this.tradingMode === 'LIVE' && this.mt5Online) {
-      this.log(`[MT5 BRIDGE] Submitting LIVE order to MT5: ${side} ${this.pair} (${this.config.lotSize} Lots)...`);
+    // Direct MT5 Execution Bridge (for both LIVE and MT5_DEMO)
+    const isMT5 = (this.tradingMode === 'LIVE' || this.tradingMode === 'MT5_DEMO') && this.mt5Online;
+    if (isMT5) {
+      const modeLabel = this.tradingMode === 'LIVE' ? 'REAL LIVE' : 'MT5 DEMO';
+      this.log(`[MT5 BRIDGE] Submitting ${modeLabel} order to MT5: ${side} ${this.pair} (${this.config.lotSize} Lots)...`);
       try {
         const orderRes = await fetch(`${this.apiBase}/api/order`, {
           method: 'POST',
@@ -584,7 +741,7 @@ class ForexScalperEngine {
         if (orderData.success) {
           mt5Ticket = orderData.ticket;
           entryPrice = orderData.price || entryPrice;
-          this.log(`[MT5 LIVE SUCCESS] Order executed in MT5 Terminal! Ticket #${mt5Ticket} @ ${entryPrice}`);
+          this.log(`[MT5 ${modeLabel} SUCCESS] Order executed in MT5 Terminal! Ticket #${mt5Ticket} @ ${entryPrice}`);
         } else {
           this.log(`[MT5 ERROR] Order rejected by broker: ${orderData.error}`);
           alert(`MT5 Order Rejected: ${orderData.error}`);
@@ -620,7 +777,9 @@ class ForexScalperEngine {
       type: side
     });
 
-    const modeTag = this.tradingMode === 'LIVE' ? '🔴 [LIVE REAL MONEY]' : '🧪 [DEMO PAPER]';
+    let modeTag = '🧪 [PAPER SIMULATION DEMO]';
+    if (this.tradingMode === 'LIVE') modeTag = '🔴 [LIVE REAL MONEY]';
+    else if (this.tradingMode === 'MT5_DEMO') modeTag = '🧪 [MT5 BROKER DEMO]';
     this.log(`${modeTag} ${side} ${this.pair} @ ${entryPrice.toFixed(profile.decimals)} | Lots: ${this.config.lotSize} | TP: ${takeProfitPrice} (+${this.config.takeProfitPips}p) | SL: ${stopLossPrice} (-${this.config.stopLossPips}p)`);
     this.playSound('buy');
     this.updateActivePositionsTable();
