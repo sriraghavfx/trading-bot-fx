@@ -127,6 +127,11 @@ class MT5BridgeHandler(SimpleHTTPRequestHandler):
         account = mt5.account_info()
         terminal = mt5.terminal_info()
 
+        trade_mode_str = "DEMO"
+        if account:
+            mode_val = getattr(account, "trade_mode", 0)
+            trade_mode_str = "REAL" if mode_val == 2 else "DEMO"
+
         self._send_json({
             "connected": True,
             "account": {
@@ -138,6 +143,7 @@ class MT5BridgeHandler(SimpleHTTPRequestHandler):
                 "margin": account.margin if account else 0.0,
                 "free_margin": account.margin_free if account else 10000.0,
                 "currency": account.currency if account else "USD",
+                "trade_mode": trade_mode_str,
                 "trade_allowed": terminal.trade_allowed if terminal else False
             } if account else None
         })
@@ -148,12 +154,15 @@ class MT5BridgeHandler(SimpleHTTPRequestHandler):
             return
         account = mt5.account_info()
         if account:
+            mode_val = getattr(account, "trade_mode", 0)
+            trade_mode_str = "REAL" if mode_val == 2 else "DEMO"
             self._send_json({
                 "login": account.login,
                 "server": account.server,
                 "balance": account.balance,
                 "equity": account.equity,
-                "currency": account.currency
+                "currency": account.currency,
+                "trade_mode": trade_mode_str
             })
         else:
             self._send_json({"error": "No active MT5 account"})
@@ -174,7 +183,9 @@ class MT5BridgeHandler(SimpleHTTPRequestHandler):
         authorized = mt5.login(login, password=password, server=server)
         if authorized:
             account = mt5.account_info()
-            logging.info(f"Connected to MT5 Account #{login} on {server} successfully.")
+            mode_val = getattr(account, "trade_mode", 0) if account else 0
+            trade_mode_str = "REAL" if mode_val == 2 else "DEMO"
+            logging.info(f"Connected to MT5 Account #{login} ({trade_mode_str}) on {server} successfully.")
             self._send_json({
                 "success": True,
                 "account": {
@@ -182,7 +193,8 @@ class MT5BridgeHandler(SimpleHTTPRequestHandler):
                     "server": account.server,
                     "balance": account.balance,
                     "equity": account.equity,
-                    "currency": account.currency
+                    "currency": account.currency,
+                    "trade_mode": trade_mode_str
                 }
             })
         else:
