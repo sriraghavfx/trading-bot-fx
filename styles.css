@@ -176,6 +176,64 @@ body {
   box-shadow: 0 0 8px var(--red);
 }
 
+.mode-badge.demo {
+  background: rgba(0, 230, 118, 0.2);
+  border-color: var(--green);
+  color: var(--green);
+  box-shadow: 0 0 12px var(--green-glow);
+}
+
+.mode-dot.demo {
+  background: var(--green);
+  box-shadow: 0 0 8px var(--green);
+}
+
+.modal-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 10px;
+}
+
+.modal-tab-btn {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.modal-tab-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--text-muted);
+}
+
+.modal-tab-btn.active.tab-demo {
+  background: rgba(0, 230, 118, 0.15);
+  color: var(--green);
+  border-color: var(--green);
+}
+
+.modal-tab-btn.active.tab-paper {
+  background: rgba(41, 121, 255, 0.15);
+  color: var(--blue);
+  border-color: var(--blue);
+}
+
+.modal-tab-btn.active.tab-live {
+  background: rgba(255, 61, 113, 0.15);
+  color: #ff3d71;
+  border-color: var(--red);
+}
+
 /* Modal */
 .modal-overlay {
   position: fixed;
@@ -195,8 +253,8 @@ body {
   background: var(--bg-secondary);
   border: 1px solid var(--border-color);
   border-radius: 12px;
-  width: 460px;
-  max-width: 90vw;
+  width: 480px;
+  max-width: 92vw;
   padding: 24px;
   box-shadow: 0 10px 40px rgba(0,0,0,0.6);
 }
